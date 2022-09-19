@@ -1,0 +1,16 @@
+---
+title: "HelloWorld"
+output:
+  pdf_document: default
+  html_document: default
+date: "2022-09-19"
+---
+```{r}
+# install.packages("data.table")
+# install.packages("ggplot2")
+# install.packages("fixest")
+# install.packages("knitr")
+# install.packages("dplyr")
+cat("Hello World!")
+```
+

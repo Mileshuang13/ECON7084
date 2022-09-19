@@ -1,0 +1,10 @@
+---
+title: "Simulation"
+output: html_document
+date: "2022-09-19"
+---
+# Simulation
+```{r}
+asdfasdf
+```
+

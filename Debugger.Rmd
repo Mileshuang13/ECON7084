@@ -1,0 +1,17 @@
+---
+title: "Debugger"
+output: html_document
+date: "2022-09-19"
+---
+```{r}
+plus <- function(x,y){
+  z <- x + y
+  return(z)
+}
+debug(plus)
+plus(x,y)
+# x <- 3
+# y <- 4
+# z <- 7 
+```
+
