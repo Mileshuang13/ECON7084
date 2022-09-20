@@ -1,10 +1,64 @@
 ---
 title: "Simulation"
-output: html_document
+output:
+  html_document: default
+  pdf_document: 
+    keep_tex: yes
 date: "2022-09-19"
 ---
 # Simulation
+
+sigma nu = sqrt(var1 + var0 - 2 cov(0,1))
 ```{r}
-asdfasdf
+# initial setup
+library(data.table)
+library(MASS)
+N <- 10*1000^2 # 10 million obs
+m0 <- 0
+m1 <- 1
+s0 <- 1
+s1 <- 2
+s01 <- 0.3
+rho <- s01/(sqrt(s0*s1))
+s_nu <- sqrt(s0^2 + s1^2 - 2 * rho * s0 * s1 * s01)
+C <- 0.5
+z <- (m0 - m1 + C)/s_nu
+set.seed(1234)
+```
+
+```{r}
+# data.table
+bivariate_epsilon <- as.data.table(mvrnorm(n=N,
+                                        mu=c(m0, m1),
+                                        Sigma=matrix(c(s0^2, s01, s01, s1^2),
+                                                     ncol=2,
+                                                     byrow = TRUE)))
+names(bivariate_epsilon) <- c("e0","e1")
+bivariate_epsilon$w0 <- m0 + bivariate_epsilon$e0
+bivariate_epsilon$w1 <- m1 + bivariate_epsilon$e1
+
+# Immigrate iff w1 > w0 + C
+
+bivariate_epsilon$I <- 0
+bivariate_epsilon$I[(bivariate_epsilon$w1 - bivariate_epsilon$w0 - C)>0] <- 1
+num_I <- sum(bivariate_epsilon$I)
+
+Ew_0 <- sum(bivariate_epsilon$w0 * bivariate_epsilon$I)/num_I
+Ew_1 <- sum(bivariate_epsilon$w1 * bivariate_epsilon$I)/num_I
+
+# rho ~ 0.2121; s0/s1 = 0.5; s1/s0 = 2 
+# hence, third case (Ee_0 < 0 (lower tail) and Ee_1 > 0 (upper tail))
+# a minority group in the host country is depressed and
+# gets better pays in the source country
+
+RHS_Ew_0 <- m0 + (s0*s1)/s_nu*(rho - s0/s1)*(dnorm(z,mean=0,sd=1)/
+                                               (1-pnorm(z,mean=0,sd=1)))
+RHS_Ew_1 <- m1 + (s0*s1)/s_nu*(s1/s0 - rho)*(dnorm(z,mean=0,sd=1)/
+                                               (1-pnorm(z,mean=0,sd=1)))
+
+comparison <- data.frame(empirical = c(Ew_0,Ew_1),
+                         theoretical = c(RHS_Ew_0,RHS_Ew_1))
+row.names(comparison) <- c("epsilon_0", "epsilon_1")
+comparison
 ```
 
